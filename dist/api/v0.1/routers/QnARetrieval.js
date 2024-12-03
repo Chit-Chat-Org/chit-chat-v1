@@ -1,30 +1,25 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const Train_schema_1 = __importDefault(require("../schema/Train.schema"));
-const bcrypt_1 = __importDefault(require("bcrypt"));
-const RetriveAws_1 = require("../services/aws/RetriveAws");
-const CohereAi_1 = require("../config/CohereAi");
-const GoogleGenAI_1 = require("../config/GoogleGenAI");
-const openAI_1 = require("../config/openAI");
-const ioredis_1 = __importDefault(require("ioredis"));
-const util_1 = __importDefault(require("util"));
-const app = (0, express_1.Router)();
+import { Router } from "express";
+import AiTrainingModel from "../schema/Train.schema";
+import bcrypt from "bcrypt";
+import { RetriveDataAws } from "../services/aws/RetriveAws";
+import { cohere } from "../config/CohereAi";
+import { generationConfig, model } from "../config/GoogleGenAI";
+import { openai } from "../config/openAI";
+import Redis from 'ioredis';
+import util from 'util';
+const app = Router();
 const rediskey = process.env.REDISS_URI;
 if (!rediskey) {
     throw new Error("Invalid Redis API key");
 }
-const redis = new ioredis_1.default(rediskey, {
+const redis = new Redis(rediskey, {
     tls: {
         rejectUnauthorized: false
     }
 });
 let embeddingStore = {};
-const getAsync = util_1.default.promisify(redis.get).bind(redis);
-const setAsync = util_1.default.promisify(redis.set).bind(redis);
+const getAsync = util.promisify(redis.get).bind(redis);
+const setAsync = util.promisify(redis.set).bind(redis);
 app.post("/", async (req, res) => {
     try {
         const key = req.query.key;
@@ -44,14 +39,14 @@ app.post("/", async (req, res) => {
                 message: cachedData,
             });
         }
-        const data = await Train_schema_1.default.findOne({ apiKey: req.query.key });
+        const data = await AiTrainingModel.findOne({ apiKey: req.query.key });
         if (!data) {
             return res.json({
                 status: "Error",
                 message: "Invalid ApiKey",
             });
         }
-        const isValidApiKey = await bcrypt_1.default.compare(data.originalAPIKey, key);
+        const isValidApiKey = await bcrypt.compare(data.originalAPIKey, key);
         if (isValidApiKey && data.isDisabled) {
             return res.json({
                 status: "Error",
@@ -62,10 +57,10 @@ app.post("/", async (req, res) => {
             try {
                 let embeddedQuestion;
                 const fileName = extractFileNamewithExt(data.embeddedKnowlege);
-                const embeddingStoreJSON = await (0, RetriveAws_1.RetriveDataAws)(`embedding/${fileName}`);
+                const embeddingStoreJSON = await RetriveDataAws(`embedding/${fileName}`);
                 embeddingStore = JSON.parse(embeddingStoreJSON);
                 if (data.embeddingModel == "OpenAI") {
-                    let embeddedQuestionResponse = await openAI_1.openai.embeddings.create({
+                    let embeddedQuestionResponse = await openai.embeddings.create({
                         input: req.body.prompt,
                         model: "text-embedding-ada-002",
                     });
@@ -77,7 +72,7 @@ app.post("/", async (req, res) => {
                     }
                 }
                 else {
-                    let embeddedQuestionResponse = await CohereAi_1.cohere.embed({
+                    let embeddedQuestionResponse = await cohere.embed({
                         texts: [req.body.prompt],
                         model: "embed-english-v3.0",
                         inputType: "classification",
@@ -94,7 +89,7 @@ app.post("/", async (req, res) => {
                 let responseData;
                 const str = Prompt(req.body.prompt, closestParagraphs);
                 if (llm == "OpenAI") {
-                    let completionData = await openAI_1.openai.chat.completions.create({
+                    let completionData = await openai.chat.completions.create({
                         model: "gpt-3.5-turbo-16k",
                         messages: [
                             {
@@ -110,8 +105,8 @@ app.post("/", async (req, res) => {
                     responseData = completionData.choices[0].message.content.trim();
                 }
                 else {
-                    const chat = GoogleGenAI_1.model.startChat({
-                        generationConfig: GoogleGenAI_1.generationConfig,
+                    const chat = model.startChat({
+                        generationConfig: generationConfig,
                     });
                     const result = await chat.sendMessage(str);
                     responseData = result.response.text();
@@ -139,7 +134,7 @@ app.post("/", async (req, res) => {
         });
     }
 });
-exports.default = app;
+export default app;
 const extractFileNamewithExt = (url) => {
     const fileName = url.substring(url.lastIndexOf("/") + 1);
     return fileName;

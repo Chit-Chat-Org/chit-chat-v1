@@ -1,16 +1,11 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const SignUp_1 = __importDefault(require("../schema/SignUp"));
-const router = (0, express_1.Router)();
+import { Router } from "express";
+import Signup from "../schema/SignUp";
+const router = Router();
 router.post("/", async (req, res) => {
     try {
         const { username, email, ExternalId, fullname } = req.body;
         // Check if user already exists
-        const findUser = await SignUp_1.default.findOne({ _id: ExternalId });
+        const findUser = await Signup.findOne({ _id: ExternalId });
         if (findUser) {
             return res.status(400).json({
                 status: "User Already Exist!",
@@ -18,7 +13,7 @@ router.post("/", async (req, res) => {
                 error: "User already exists.",
             });
         }
-        const register = await SignUp_1.default.create({
+        const register = await Signup.create({
             _id: ExternalId,
             username,
             email,
@@ -40,7 +35,7 @@ router.post("/", async (req, res) => {
         });
     }
 });
-exports.default = router;
+export default router;
 //import { Request, Router, Response } from "express";
 // import { hashPassword } from "../services/HashedPassword";
 // import Signup from "../schema/SignUp";
