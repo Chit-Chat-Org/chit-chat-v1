@@ -1,11 +1,16 @@
-import { Router } from "express";
-import Signup from "../schema/SignUp";
-const router = Router();
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const SignUp_1 = __importDefault(require("../schema/SignUp"));
+const router = (0, express_1.Router)();
 router.post("/", async (req, res) => {
     try {
         const { ExternalId } = req.body;
         // Find user by ExternalId
-        const findUser = await Signup.findOne({ _id: ExternalId });
+        const findUser = await SignUp_1.default.findOne({ _id: ExternalId });
         if (!findUser) {
             return res.status(404).json({
                 status: "Failed",
@@ -29,7 +34,7 @@ router.post("/", async (req, res) => {
         });
     }
 });
-export default router;
+exports.default = router;
 // import { Router, Response, Request } from "express";
 // import Signup from "../schema/SignUp";
 // import { compareHashedPassword } from "../services/HashedPassword";

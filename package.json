@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "",
   "main": "src/index.ts",
-  "type": "module",
   "repository": "https://github.com/chit-chat-org/chit-chat-v1",
   "author": "Apurv Jha",
   "license": "MIT",

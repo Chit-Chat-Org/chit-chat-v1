@@ -1,6 +1,11 @@
-import { Router } from "express";
-import OrganizationModel from "../schema/Org.schema";
-const app = Router();
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const Org_schema_1 = __importDefault(require("../schema/Org.schema"));
+const app = (0, express_1.Router)();
 app.post("/", async (req, res) => {
     try {
         const userId = req.body.userId;
@@ -11,7 +16,7 @@ app.post("/", async (req, res) => {
                 error: "Not Authenticated !",
             });
         }
-        const newOrganization = await OrganizationModel.create({
+        const newOrganization = await Org_schema_1.default.create({
             userId: userId,
             OrganizationName: req.body.OrganizationName,
             OrganizationWebsite: req.body.OrganizationWebsite,
@@ -44,7 +49,7 @@ app.get("/", async (req, res) => {
                 error: "UserId query parameter not found",
             });
         }
-        const allOrg = await OrganizationModel.find({
+        const allOrg = await Org_schema_1.default.find({
             userId: userIdFromQuery,
         });
         res.json({
@@ -62,4 +67,4 @@ app.get("/", async (req, res) => {
         });
     }
 });
-export default app;
+exports.default = app;

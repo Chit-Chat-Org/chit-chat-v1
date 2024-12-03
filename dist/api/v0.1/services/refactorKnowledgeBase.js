@@ -1,4 +1,7 @@
-export function refactor(fileName, knowledgeSource) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.refactor = void 0;
+function refactor(fileName, knowledgeSource) {
     const text = knowledgeSource;
     let paras = [];
     const rawValue = text.split(/\n\s*\n/);
@@ -12,3 +15,4 @@ export function refactor(fileName, knowledgeSource) {
     }
     return paras;
 }
+exports.refactor = refactor;
