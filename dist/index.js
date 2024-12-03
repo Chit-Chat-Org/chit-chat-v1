@@ -12,7 +12,6 @@ require("./api/v0.1/config/mongodb");
 const body_parser_1 = __importDefault(require("body-parser"));
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const cors_1 = __importDefault(require("cors"));
-const path_1 = __importDefault(require("path"));
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 8001;
 // Middleware
@@ -21,17 +20,8 @@ app.use((0, cors_1.default)({ origin: true }));
 app.use((0, express_fileupload_1.default)());
 // API Routes
 app.use("/", register_1.default);
-app.use('/api/v1', product_control_1.default);
-if (process.env.NODE_ENV === 'production') {
-    const buildPath = path_1.default.join(__dirname, "../build");
-    app.use(express_1.default.static(buildPath));
-    // app.get('*', (req: Request, res: Response) => {
-    //   res.sendFile(path.resolve(buildPath, 'index.html'));
-    // });
-}
-else {
-    app.get('/', (req, res) => res.send('Please set to production'));
-}
+app.use("/api/v1", product_control_1.default);
+app.get("/", (req, res) => res.send("Hello World!"));
 app.get("/health", (req, res) => {
     res.status(200).json("Hello World !");
 });

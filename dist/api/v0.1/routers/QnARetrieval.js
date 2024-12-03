@@ -145,7 +145,7 @@ const extractFileNamewithExt = (url) => {
     return fileName;
 };
 const Prompt = (question, paragraph) => {
-    return ("You are AI Assistant, your name is Chit Chat AI. developed by Apurv Krishn Jha. Answer the following question from the context, if the answer can not be deduced from the context, say 'Sorry! I didn't Understand the Question, Please explain it in detail' :\n\n" +
+    return ("You are AI Assistant, your name is Lake AI. developed by Apurv Krishn Jha. Answer the following question from the context, if the answer can not be deduced from the context, say 'Sorry! I didn't Understand the Question, Please explain it in detail' :\n\n" +
         "Context :\n" +
         paragraph.join("\n\n") +
         "\n\nQuestion :\n" +
