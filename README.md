@@ -75,7 +75,7 @@ async function generateAnswer(userQuestion, apiKey) {
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| `api_key` | `string` | **Required**. Your Chit-Chat API key |
+| `api_key` | `string` | **Require**. Your Chit-Chat API key |
 | `prompt`      | `string` | **Required**. The user's question |
 
 ### Request Example
